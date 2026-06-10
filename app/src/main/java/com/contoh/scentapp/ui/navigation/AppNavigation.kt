@@ -19,6 +19,7 @@ import com.contoh.scentapp.data.repository.SessionManager
 import com.contoh.scentapp.ui.auth.LoginScreen
 import com.contoh.scentapp.ui.auth.RegisterScreen
 import com.contoh.scentapp.ui.cart.CartScreen
+import com.contoh.scentapp.ui.cart.UploadPaymentProofScreen
 import com.contoh.scentapp.ui.detail.DetailScreen
 import com.contoh.scentapp.ui.favorite.FavoriteScreen
 import com.contoh.scentapp.ui.home.HomeScreen
@@ -34,6 +35,9 @@ import com.contoh.scentapp.ui.shipping.ShippingScreen
 import com.contoh.scentapp.ui.theme.ScentBlack
 import com.contoh.scentapp.ui.theme.components.ScentBottomNavBar
 
+// IMPORT BARU UNTUK STEP 5 & 6
+import com.contoh.scentapp.ui.order.OrderHistoryScreen
+import com.contoh.scentapp.ui.order.OrderDetailScreen
 
 private val bottomNavRoutes = setOf(
     Routes.HOME, Routes.FAVORITE, Routes.CART, Routes.PROFILE
@@ -124,6 +128,7 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
                     onBack       = { navController.popBackStack() },
                     onDetailAkun = { navController.navigate(Routes.ACCOUNT_DETAIL) },
                     onAlamat     = { navController.navigate(Routes.SHIPPING_ADDRESS) },
+                    onRiwayatPesanan = { navController.navigate(Routes.ORDER_HISTORY) }, // Tambahkan baris ini
                     onBahasa     = { navController.navigate(Routes.LANGUAGE) },
                     onPenjualan  = { navController.navigate(Routes.SALES) },
                     onLogout     = {
@@ -141,7 +146,8 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
                 val productId = backStack.arguments?.getInt("productId") ?: return@composable
                 DetailScreen(
                     productId = productId,
-                    onBack    = { navController.popBackStack() }
+                    onBack    = { navController.popBackStack() },
+                    onNavigateToCart = { navController.navigate(Routes.CART) }
                 )
             }
             composable(
@@ -165,11 +171,32 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
             composable(Routes.SHIPPING) {
                 ShippingScreen(
                     onBack    = { navController.popBackStack() },
-                    onConfirm = { navController.navigate(Routes.ORDER_SUCCESS) }
+                    onConfirm = { isTransfer ->
+                        if (isTransfer) {
+                            navController.navigate(Routes.UPLOAD_BUKTI)
+                        } else {
+                            navController.navigate(Routes.orderSuccessRoute(false))
+                        }
+                    }
                 )
             }
-            composable(Routes.ORDER_SUCCESS) {
+            composable(Routes.UPLOAD_BUKTI) {
+                UploadPaymentProofScreen(
+                    onBack = { navController.popBackStack() },
+                    onSubmit = {
+                        navController.navigate(Routes.orderSuccessRoute(true)) {
+                            popUpTo(Routes.CART) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable(
+                route = Routes.ORDER_SUCCESS,
+                arguments = listOf(navArgument("isTransfer") { type = NavType.BoolType })
+            ) { backStack ->
+                val isTransfer = backStack.arguments?.getBoolean("isTransfer") ?: false
                 OrderSuccessScreen(
+                    isTransfer = isTransfer,
                     onBackHome = {
                         navController.navigate(Routes.HOME) {
                             popUpTo(navController.graph.findStartDestination().id)
@@ -199,6 +226,27 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
                 AddProductScreen(
                     onBack = { navController.popBackStack() },
                     onSave = { navController.popBackStack() }
+                )
+            }
+
+            // --- TAMBAHAN RUTE STEP 5 & 6 ---
+            composable(Routes.ORDER_HISTORY) {
+                OrderHistoryScreen(
+                    onBack = { navController.popBackStack() },
+                    onOrderDetailClick = { orderId ->
+                        navController.navigate(Routes.orderDetailRoute(orderId))
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.ORDER_DETAIL,
+                arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+            ) { backStack ->
+                val orderId = backStack.arguments?.getString("orderId") ?: ""
+                OrderDetailScreen(
+                    orderId = orderId,
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

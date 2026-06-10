@@ -1,5 +1,6 @@
 package com.contoh.scentapp.ui.detail
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,13 +42,14 @@ import kotlin.math.roundToInt
 fun DetailScreen(
     productId : Int,
     onBack    : () -> Unit,
+    onNavigateToCart: () -> Unit,
     viewModel : DetailViewModel = viewModel(
         factory = DetailViewModel.DetailViewModelFactory(productId)
     )
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedSizeId by rememberSaveable { mutableStateOf("full") }
-
+    val context = LocalContext.current
     val listState = rememberLazyListState()
 
     Box(
@@ -75,24 +78,18 @@ fun DetailScreen(
                     contentPadding = PaddingValues(bottom = 40.dp)
                 ) {
                     item(key = "topbar") {
-                        DetailTopBar(onBack = onBack)
+                        DetailTopBar(onBack = onBack, onCartClick = onNavigateToCart)
                     }
                     item(key = "image") {
                         ProductImageSection(
                             product  = uiState.product!!,
-                            modifier = Modifier.padding(
-                                horizontal = 20.dp,
-                                vertical   = 8.dp
-                            )
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                         )
                     }
                     item(key = "info") {
                         ProductInfoSection(
                             product  = uiState.product!!,
-                            modifier = Modifier.padding(
-                                horizontal = 20.dp,
-                                vertical   = 16.dp
-                            )
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
                         )
                     }
                     item(key = "size") {
@@ -108,11 +105,11 @@ fun DetailScreen(
                     }
                     item(key = "cart_button") {
                         AddToCartButton(
-                            onClick  = { viewModel.addToCart() },
-                            modifier = Modifier.padding(
-                                horizontal = 20.dp,
-                                vertical   = 16.dp
-                            )
+                            onClick  = {
+                                viewModel.addToCart()
+                                Toast.makeText(context, "Berhasil ditambahkan ke keranjang", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
                         )
                     }
                     item(key = "divider") {
@@ -125,10 +122,7 @@ fun DetailScreen(
                     item(key = "reviews_header") {
                         ReviewsHeader(
                             product  = uiState.product!!,
-                            modifier = Modifier.padding(
-                                horizontal = 20.dp,
-                                vertical   = 20.dp
-                            )
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)
                         )
                     }
                     items(
@@ -137,10 +131,7 @@ fun DetailScreen(
                     ) { review ->
                         ReviewCard(
                             review   = review,
-                            modifier = Modifier.padding(
-                                horizontal = 20.dp,
-                                vertical   = 8.dp
-                            )
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                         )
                     }
                 }
@@ -150,7 +141,7 @@ fun DetailScreen(
 }
 
 @Composable
-private fun DetailTopBar(onBack: () -> Unit) {
+private fun DetailTopBar(onBack: () -> Unit, onCartClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -180,7 +171,9 @@ private fun DetailTopBar(onBack: () -> Unit) {
             imageVector        = Icons.Default.ShoppingBag,
             contentDescription = "Keranjang",
             tint               = ScentWhite,
-            modifier           = Modifier.size(24.dp)
+            modifier           = Modifier
+                .size(24.dp)
+                .clickable(onClick = onCartClick)
         )
     }
 }

@@ -1,11 +1,10 @@
 package com.contoh.scentapp.ui.ordersuccess
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocalShipping
@@ -16,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,44 +24,43 @@ import com.contoh.scentapp.ui.theme.*
 
 @Composable
 fun OrderSuccessScreen(
+    isTransfer   : Boolean = false,
     orderId      : String = "#SCNT-99283",
     totalPayment : String = "Rp 2.495.000",
     estimasi     : String = "2-3 Hari Kerja",
     onBackHome   : () -> Unit = {}
 ) {
+    val instruksiText = if (isTransfer) {
+        "Terima kasih atas pesanan Anda. Pembayaran transfer Anda sedang diproses dan akan segera dikonfirmasi."
+    } else {
+        "Terima kasih atas pesanan Anda. Silakan siapkan pembayaran saat kurir mengantarkan paket Anda."
+    }
+
+    val metodeText = if (isTransfer) "Transfer Bank" else "Bayar di Tempat (COD)"
+    val metodeIcon = if (isTransfer) Icons.Default.AccountBalance else Icons.Default.Money
+
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ScentBlack)
+        modifier = Modifier.fillMaxSize().background(ScentBlack)
     ) {
         Column(
-            modifier            = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(vertical = 16.dp),
-                verticalAlignment     = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
-                    imageVector        = Icons.Default.Close,
+                    imageVector = Icons.Default.Close,
                     contentDescription = "Tutup",
-                    tint               = ScentWhite,
-                    modifier           = Modifier
-                        .size(24.dp)
-                        .clickable(onClick = onBackHome)
+                    tint = ScentWhite,
+                    modifier = Modifier.size(24.dp).clickable(onClick = onBackHome)
                 )
                 Text(
-                    text  = "SCENT",
+                    text = "SCENT",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        letterSpacing = 6.sp,
-                        fontSize      = 18.sp,
-                        fontWeight    = FontWeight.Bold
+                        letterSpacing = 6.sp, fontSize = 18.sp, fontWeight = FontWeight.Bold
                     ),
                     color = ScentWhite
                 )
@@ -70,169 +68,116 @@ fun OrderSuccessScreen(
             }
             Spacer(Modifier.height(32.dp))
             Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFF1C1C1C)),
+                modifier = Modifier.size(120.dp).clip(RoundedCornerShape(20.dp)).background(Color(0xFF1C1C1C)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector        = Icons.Default.Check,
+                    imageVector = Icons.Default.Check,
                     contentDescription = "Berhasil",
-                    tint               = ScentWhite,
-                    modifier           = Modifier.size(56.dp)
+                    tint = ScentWhite,
+                    modifier = Modifier.size(56.dp)
                 )
             }
             Spacer(Modifier.height(28.dp))
             Text(
-                text      = "Pesanan Berhasil\nDitempatkan",
-                style     = MaterialTheme.typography.displayMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = 28.sp,
-                    lineHeight = 36.sp
+                text = "Pesanan Berhasil\nDitempatkan",
+                style = MaterialTheme.typography.displayMedium.copy(
+                    fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 36.sp
                 ),
-                color     = ScentWhite,
-                textAlign = TextAlign.Center
+                color = ScentWhite, textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(14.dp))
             Text(
-                text      = "Terima kasih atas pesanan Anda. Silakan siapkan pembayaran saat kurir mengantarkan paket Anda.",
-                style     = MaterialTheme.typography.bodyMedium.copy(
-                    color      = ScentTextMuted,
-                    lineHeight = 22.sp
+                text = instruksiText,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = ScentTextMuted, lineHeight = 22.sp
                 ),
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(32.dp))
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF161616))
-                    .padding(20.dp)
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFF161616)).padding(20.dp)
             ) {
-                OrderDetailRow(
-                    label = "ORDER ID",
-                    value = orderId,
-                    isLabelSmall = true
-                )
-                HorizontalDivider(
-                    color     = ScentDivider,
-                    thickness = 0.5.dp,
-                    modifier  = Modifier.padding(vertical = 16.dp)
-                )
+                OrderDetailRow(label = "ORDER ID", value = orderId, isLabelSmall = true)
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 16.dp))
                 Column {
                     Text(
-                        text  = "METODE PEMBAYARAN",
+                        text = "METODE PEMBAYARAN",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.5.sp,
-                            color         = ScentTextLabel
+                            fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel
                         )
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector        = Icons.Default.Money,
+                            imageVector = metodeIcon,
                             contentDescription = null,
-                            tint               = ScentTextMuted,
-                            modifier           = Modifier.size(20.dp)
+                            tint = ScentTextMuted,
+                            modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text  = "Bayar di Tempat (COD)",
+                            text = metodeText,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color      = ScentWhite,
-                                fontWeight = FontWeight.Medium
+                                color = ScentWhite, fontWeight = FontWeight.Medium
                             )
                         )
                     }
                 }
-                HorizontalDivider(
-                    color     = ScentDivider,
-                    thickness = 0.5.dp,
-                    modifier  = Modifier.padding(vertical = 16.dp)
-                )
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 16.dp))
                 Column {
                     Text(
-                        text  = "ESTIMASI TIBA",
+                        text = "ESTIMASI TIBA",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.5.sp,
-                            color         = ScentTextLabel
+                            fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel
                         )
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector        = Icons.Default.LocalShipping,
+                            imageVector = Icons.Default.LocalShipping,
                             contentDescription = null,
-                            tint               = ScentTextMuted,
-                            modifier           = Modifier.size(20.dp)
+                            tint = ScentTextMuted,
+                            modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text  = estimasi,
+                            text = estimasi,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color      = ScentWhite,
-                                fontWeight = FontWeight.Medium
+                                color = ScentWhite, fontWeight = FontWeight.Medium
                             )
                         )
                     }
                 }
-                HorizontalDivider(
-                    color     = ScentDivider,
-                    thickness = 0.5.dp,
-                    modifier  = Modifier.padding(vertical = 16.dp)
-                )
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 16.dp))
                 Row(
-                    modifier              = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment     = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text  = "Total Pembayaran",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color      = ScentWhite
-                        )
+                        text = "Total Pembayaran",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ScentWhite)
                     )
                     Text(
-                        text  = totalPayment,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 22.sp,
-                            color      = ScentWhite
-                        )
+                        text = totalPayment,
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 22.sp, color = ScentWhite)
                     )
                 }
             }
         }
         Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(ScentBlack)
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-                .navigationBarsPadding()
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(ScentBlack).padding(horizontal = 20.dp, vertical = 16.dp).navigationBarsPadding()
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(ScentWhite)
-                    .clickable(onClick = onBackHome)
-                    .padding(vertical = 18.dp),
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(ScentWhite).clickable(onClick = onBackHome).padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text  = "KEMBALI KE BERANDA",
+                    text = "KEMBALI KE BERANDA",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize      = 12.sp,
-                        letterSpacing = 2.sp,
-                        fontWeight    = FontWeight.Bold,
-                        color         = ScentBlack
+                        fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold, color = ScentBlack
                     )
                 )
             }
@@ -241,33 +186,20 @@ fun OrderSuccessScreen(
 }
 
 @Composable
-private fun OrderDetailRow(
-    label        : String,
-    value        : String,
-    isLabelSmall : Boolean = false
-) {
+private fun OrderDetailRow(label: String, value: String, isLabelSmall: Boolean = false) {
     Row(
-        modifier              = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment     = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text  = label,
-            style = if (isLabelSmall)
-                MaterialTheme.typography.labelSmall.copy(
-                    fontSize      = 10.sp,
-                    letterSpacing = 1.5.sp,
-                    color         = ScentTextLabel
-                )
-            else
-                MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted)
+            text = label,
+            style = if (isLabelSmall) MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel)
+            else MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted)
         )
         Text(
-            text  = value,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color      = ScentWhite
-            )
+            text = value,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ScentWhite)
         )
     }
 }

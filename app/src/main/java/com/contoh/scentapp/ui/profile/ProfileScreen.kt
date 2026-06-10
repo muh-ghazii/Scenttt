@@ -15,20 +15,23 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.contoh.scentapp.MainActivity
+import com.contoh.scentapp.data.repository.SessionManager
 import com.contoh.scentapp.ui.theme.*
 
 @Composable
@@ -36,6 +39,7 @@ fun ProfileScreen(
     onBack       : () -> Unit = {},
     onDetailAkun : () -> Unit = {},
     onAlamat     : () -> Unit = {},
+    onRiwayatPesanan: () -> Unit = {},
     onBahasa     : () -> Unit = {},
     onPenjualan  : () -> Unit = {},
     onLogout     : () -> Unit = {},
@@ -43,12 +47,15 @@ fun ProfileScreen(
 ) {
     val uiState   by viewModel.uiState.collectAsStateWithLifecycle()
     val listState  = rememberLazyListState()
-    var isDarkMode by rememberSaveable { mutableStateOf(uiState.isDarkMode) }
+
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager.getInstance(context) }
+    val isDarkMode by sessionManager.isDarkMode.collectAsState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             state          = listState,
@@ -67,7 +74,7 @@ fun ProfileScreen(
                     Icon(
                         imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Kembali",
-                        tint               = ScentWhite,
+                        tint               = MaterialTheme.colorScheme.onBackground,
                         modifier           = Modifier
                             .size(24.dp)
                             .clickable(onClick = onBack)
@@ -79,12 +86,12 @@ fun ProfileScreen(
                             fontSize      = 16.sp,
                             fontWeight    = FontWeight.Bold
                         ),
-                        color = ScentWhite
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Icon(
                         imageVector        = Icons.Default.Logout,
                         contentDescription = "Keluar",
-                        tint               = ScentWhite,
+                        tint               = MaterialTheme.colorScheme.onBackground,
                         modifier           = Modifier
                             .size(24.dp)
                             .clickable(onClick = onLogout)
@@ -102,7 +109,7 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(90.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(ScentSearchBg),
+                            .background(if (isDarkMode) ScentSearchBg else Color(0xFFE9ECEF)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -120,7 +127,7 @@ fun ProfileScreen(
                                 fontSize   = 22.sp,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = ScentWhite
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
@@ -143,7 +150,7 @@ fun ProfileScreen(
                                     fontSize      = 10.sp,
                                     letterSpacing = 2.sp,
                                     fontWeight    = FontWeight.Bold,
-                                    color         = ScentWhite
+                                    color         = MaterialTheme.colorScheme.onBackground
                                 )
                             )
                         }
@@ -166,13 +173,15 @@ fun ProfileScreen(
             }
             item(key = "detail_akun") {
                 MenuItem(Icons.Default.Person, "Detail Akun", onDetailAkun)
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
             }
             item(key = "alamat") {
                 MenuItem(Icons.Default.LocationOn, "Alamat Pengiriman", onAlamat)
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
+            }
+            item(key = "pesanan_saya") {
+                MenuItem(Icons.Default.ListAlt, "Pesanan Saya", onRiwayatPesanan)
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
             }
             item(key = "section_pref") {
                 Spacer(Modifier.height(24.dp))
@@ -185,23 +194,27 @@ fun ProfileScreen(
                 )
             }
             item(key = "bahasa") {
-                MenuItemWithSubtitle(Icons.Default.Language, "Bahasa",
-                    uiState.language, onBahasa)
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                MenuItemWithSubtitle(Icons.Default.Language, "Bahasa", uiState.language, onBahasa)
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
             }
             item(key = "dark_mode") {
-                MenuItemWithToggle(Icons.Default.DarkMode, "Mode Gelap", isDarkMode) {
-                    isDarkMode = !isDarkMode
+                MenuItemWithToggle(
+                    icon = Icons.Default.DarkMode,
+                    label = "Mode Gelap",
+                    isChecked = MainActivity.isDarkModeState
+                ) {
+                    MainActivity.isDarkModeState = !MainActivity.isDarkModeState
                     viewModel.toggleDarkMode()
                 }
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                HorizontalDivider(
+                    color = ScentDivider,
+                    thickness = 0.5.dp,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                )
             }
             item(key = "penjualan") {
                 MenuItem(Icons.Default.Store, "Penjualan", onPenjualan)
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp))
+                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
             }
             item(key = "delete") {
                 Spacer(Modifier.height(32.dp))
@@ -230,10 +243,9 @@ fun ProfileScreen(
         if (uiState.showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.hideDeleteDialog() },
-                containerColor   = Color(0xFF1C1C1C),
+                containerColor   = if (isDarkMode) Color(0xFF1C1C1C) else Color.White,
                 title = {
-                    Text("Hapus Akun",
-                        style = MaterialTheme.typography.titleMedium, color = ScentWhite)
+                    Text("Hapus Akun", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground)
                 },
                 text = {
                     Text(
@@ -243,16 +255,12 @@ fun ProfileScreen(
                 },
                 confirmButton = {
                     TextButton(onClick = { viewModel.confirmDeleteAccount() }) {
-                        Text("HAPUS", color = Color(0xFFCF6679),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold, letterSpacing = 1.sp))
+                        Text("HAPUS", color = Color(0xFFCF6679), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.hideDeleteDialog() }) {
-                        Text("BATAL", color = ScentTextMuted,
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold, letterSpacing = 1.sp))
+                        Text("BATAL", color = ScentTextMuted, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp))
                     }
                 }
             )
@@ -273,10 +281,9 @@ private fun MenuItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = ScentTextMuted, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(16.dp))
-            Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = ScentWhite))
+            Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground))
         }
-        Icon(Icons.Default.ChevronRight, null, tint = ScentTextMuted,
-            modifier = Modifier.size(20.dp))
+        Icon(Icons.Default.ChevronRight, null, tint = ScentTextMuted, modifier = Modifier.size(20.dp))
     }
 }
 
@@ -296,13 +303,11 @@ private fun MenuItemWithSubtitle(
             Icon(icon, null, tint = ScentTextMuted, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(16.dp))
             Column {
-                Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = ScentWhite))
-                Text(subtitle, style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = 10.sp, letterSpacing = 1.sp, color = ScentTextMuted))
+                Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground))
+                Text(subtitle, style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, letterSpacing = 1.sp, color = ScentTextMuted))
             }
         }
-        Icon(Icons.Default.ChevronRight, null, tint = ScentTextMuted,
-            modifier = Modifier.size(20.dp))
+        Icon(Icons.Default.ChevronRight, null, tint = ScentTextMuted, modifier = Modifier.size(20.dp))
     }
 }
 
@@ -320,7 +325,7 @@ private fun MenuItemWithToggle(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = ScentTextMuted, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(16.dp))
-            Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = ScentWhite))
+            Text(label, style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground))
         }
         Switch(
             checked         = isChecked,

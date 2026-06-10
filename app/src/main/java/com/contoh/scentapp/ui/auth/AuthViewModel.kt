@@ -81,7 +81,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             delay(800)
-            sessionManager.saveSession(email = state.registerEmail, name = state.registerName)
+            sessionManager.saveSession(email = state.registerEmail)
             _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
             onSuccess()
         }

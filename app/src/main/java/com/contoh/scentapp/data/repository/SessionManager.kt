@@ -2,57 +2,50 @@ package com.contoh.scentapp.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.content.edit
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Menyimpan sesi login agar akun tidak logout saat aplikasi ditutup.
- */
 class SessionManager private constructor(context: Context) {
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("ScentPrefs", Context.MODE_PRIVATE)
 
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    // ── Dark Mode ──────────────────────────────────────────────
+    private val _isDarkMode = MutableStateFlow(sharedPreferences.getBoolean("KEY_DARK_MODE", true))
+    val isDarkMode: StateFlow<Boolean> = _isDarkMode
+
+    fun setDarkMode(enabled: Boolean) {
+        sharedPreferences.edit().putBoolean("KEY_DARK_MODE", enabled).apply()
+        _isDarkMode.value = enabled
+    }
+
+    // ── Session / Login ────────────────────────────────────────
+    fun saveSession(email: String) {
+        sharedPreferences.edit()
+            .putString("KEY_EMAIL", email)
+            .putBoolean("KEY_IS_LOGGED_IN", true)
+            .apply()
+    }
+
+    fun isLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean("KEY_IS_LOGGED_IN", false)
+    }
+
+    fun getEmail(): String? {
+        return sharedPreferences.getString("KEY_EMAIL", null)
+    }
+
+    fun clearSession() {
+        sharedPreferences.edit().clear().apply()
+    }
 
     companion object {
-        private const val PREFS_NAME     = "scent_session"
-        private const val KEY_IS_LOGGED  = "is_logged_in"
-        private const val KEY_USER_EMAIL = "user_email"
-        private const val KEY_USER_NAME  = "user_name"
-        private const val KEY_LAST_OPEN  = "last_open_ms"
+        @Volatile
+        private var INSTANCE: SessionManager? = null
 
-        @Volatile private var INSTANCE: SessionManager? = null
-
-        fun getInstance(context: Context): SessionManager =
-            INSTANCE ?: synchronized(this) {
+        fun getInstance(context: Context): SessionManager {
+            return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: SessionManager(context.applicationContext).also { INSTANCE = it }
             }
-    }
-
-    /** Panggil saat login/register berhasil */
-    fun saveSession(email: String, name: String = "") {
-        prefs.edit {
-            putBoolean(KEY_IS_LOGGED, true)
-            putString(KEY_USER_EMAIL, email)
-            putString(KEY_USER_NAME, name)
-            putLong(KEY_LAST_OPEN, System.currentTimeMillis())
         }
     }
-
-    /** Panggil saat tombol Logout ditekan */
-    fun clearSession() {
-        prefs.edit {
-            putBoolean(KEY_IS_LOGGED, false)
-            remove(KEY_USER_EMAIL)
-            remove(KEY_USER_NAME)
-        }
-    }
-
-    /** Update waktu terakhir buka */
-    fun updateLastOpen() {
-        prefs.edit { putLong(KEY_LAST_OPEN, System.currentTimeMillis()) }
-    }
-
-    val isLoggedIn: Boolean  get() = prefs.getBoolean(KEY_IS_LOGGED, false)
-    val userEmail : String   get() = prefs.getString(KEY_USER_EMAIL, "") ?: ""
-    val userName  : String   get() = prefs.getString(KEY_USER_NAME, "") ?: ""
-    val lastOpenMs: Long     get() = prefs.getLong(KEY_LAST_OPEN, 0L)
 }
