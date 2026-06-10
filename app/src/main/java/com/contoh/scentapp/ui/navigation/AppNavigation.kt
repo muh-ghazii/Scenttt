@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -14,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.contoh.scentapp.data.model.Routes
 import com.contoh.scentapp.data.repository.SessionManager
 import com.contoh.scentapp.ui.auth.LoginScreen
@@ -30,12 +32,12 @@ import com.contoh.scentapp.ui.profile.ProfileScreen
 import com.contoh.scentapp.ui.profile.ShippingAddressScreen
 import com.contoh.scentapp.ui.sales.AddProductScreen
 import com.contoh.scentapp.ui.sales.SalesScreen
+import com.contoh.scentapp.ui.sales.SalesViewModel
+import com.contoh.scentapp.ui.sales.SalesViewModelFactory
 import com.contoh.scentapp.ui.search.SearchScreen
 import com.contoh.scentapp.ui.shipping.ShippingScreen
 import com.contoh.scentapp.ui.theme.ScentBlack
 import com.contoh.scentapp.ui.theme.components.ScentBottomNavBar
-
-// IMPORT BARU UNTUK STEP 5 & 6
 import com.contoh.scentapp.ui.order.OrderHistoryScreen
 import com.contoh.scentapp.ui.order.OrderDetailScreen
 
@@ -125,13 +127,13 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
             }
             composable(Routes.PROFILE) {
                 ProfileScreen(
-                    onBack       = { navController.popBackStack() },
-                    onDetailAkun = { navController.navigate(Routes.ACCOUNT_DETAIL) },
-                    onAlamat     = { navController.navigate(Routes.SHIPPING_ADDRESS) },
-                    onRiwayatPesanan = { navController.navigate(Routes.ORDER_HISTORY) }, // Tambahkan baris ini
-                    onBahasa     = { navController.navigate(Routes.LANGUAGE) },
-                    onPenjualan  = { navController.navigate(Routes.SALES) },
-                    onLogout     = {
+                    onBack           = { navController.popBackStack() },
+                    onDetailAkun     = { navController.navigate(Routes.ACCOUNT_DETAIL) },
+                    onAlamat         = { navController.navigate(Routes.SHIPPING_ADDRESS) },
+                    onRiwayatPesanan = { navController.navigate(Routes.ORDER_HISTORY) },
+                    onBahasa         = { navController.navigate(Routes.LANGUAGE) },
+                    onPenjualan      = { navController.navigate(Routes.SALES) },
+                    onLogout         = {
                         SessionManager.getInstance(context).clearSession()
                         navController.navigate(Routes.LOGIN) {
                             popUpTo(navController.graph.id) { inclusive = true }
@@ -145,8 +147,8 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
             ) { backStack ->
                 val productId = backStack.arguments?.getInt("productId") ?: return@composable
                 DetailScreen(
-                    productId = productId,
-                    onBack    = { navController.popBackStack() },
+                    productId        = productId,
+                    onBack           = { navController.popBackStack() },
                     onNavigateToCart = { navController.navigate(Routes.CART) }
                 )
             }
@@ -170,19 +172,14 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
             }
             composable(Routes.SHIPPING) {
                 ShippingScreen(
-                    onBack    = { navController.popBackStack() },
-                    onConfirm = { isTransfer ->
-                        if (isTransfer) {
-                            navController.navigate(Routes.UPLOAD_BUKTI)
-                        } else {
-                            navController.navigate(Routes.orderSuccessRoute(false))
-                        }
-                    }
+                    onBack       = { navController.popBackStack() },
+                    onCODSuccess = { navController.navigate(Routes.orderSuccessRoute(isTransfer = false)) },
+                    onTransfer   = { navController.navigate(Routes.UPLOAD_BUKTI) }
                 )
             }
             composable(Routes.UPLOAD_BUKTI) {
                 UploadPaymentProofScreen(
-                    onBack = { navController.popBackStack() },
+                    onBack   = { navController.popBackStack() },
                     onSubmit = {
                         navController.navigate(Routes.orderSuccessRoute(true)) {
                             popUpTo(Routes.CART) { inclusive = true }
@@ -191,7 +188,7 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
                 )
             }
             composable(
-                route = Routes.ORDER_SUCCESS,
+                route     = Routes.ORDER_SUCCESS,
                 arguments = listOf(navArgument("isTransfer") { type = NavType.BoolType })
             ) { backStack ->
                 val isTransfer = backStack.arguments?.getBoolean("isTransfer") ?: false
@@ -208,45 +205,65 @@ fun AppNavigation(startLoggedIn: Boolean = false) {
             composable(Routes.ACCOUNT_DETAIL) {
                 AccountDetailScreen(onBack = { navController.popBackStack() })
             }
-
             composable(Routes.SHIPPING_ADDRESS) {
                 ShippingAddressScreen(onBack = { navController.popBackStack() })
             }
-
             composable(Routes.LANGUAGE) {
                 LanguageScreen(onBack = { navController.popBackStack() })
             }
-            composable(Routes.SALES) {
+
+            // ── ✅ FIX: SALES — ikat ViewModel ke backStackEntry ini ──────────
+            // Tujuannya agar AddProduct bisa ambil ViewModel yang SAMA
+            composable(Routes.SALES) { backStackEntry ->
+                val salesViewModel: SalesViewModel = viewModel(
+                    viewModelStoreOwner = backStackEntry,
+                    factory             = SalesViewModelFactory()
+                )
                 SalesScreen(
+                    viewModel    = salesViewModel,
                     onBack       = { navController.popBackStack() },
                     onAddProduct = { navController.navigate(Routes.ADD_PRODUCT) }
                 )
             }
-            composable(Routes.ADD_PRODUCT) {
+
+            // ── ✅ FIX: ADD_PRODUCT — pakai ViewModel yang SAMA dari SALES ────
+            // Tanpa ini onSave() tidak akan update list di SalesScreen
+            composable(Routes.ADD_PRODUCT) { currentEntry ->
+                val salesEntry = remember(currentEntry) {
+                    navController.getBackStackEntry(Routes.SALES)
+                }
+                val salesViewModel: SalesViewModel = viewModel(
+                    viewModelStoreOwner = salesEntry,
+                    factory             = SalesViewModelFactory()
+                )
                 AddProductScreen(
                     onBack = { navController.popBackStack() },
-                    onSave = { navController.popBackStack() }
+                    onSave = { newProduct ->
+                        // ✅ Simpan ke Repository via ViewModel
+                        // HomeViewModel otomatis ter-update karena collect repository.products
+                        salesViewModel.addProduct(newProduct)
+                        navController.popBackStack()
+                    }
                 )
             }
 
-            // --- TAMBAHAN RUTE STEP 5 & 6 ---
+            // ── Order History & Detail ─────────────────────────────────────────
             composable(Routes.ORDER_HISTORY) {
                 OrderHistoryScreen(
-                    onBack = { navController.popBackStack() },
+                    onBack             = { navController.popBackStack() },
                     onOrderDetailClick = { orderId ->
                         navController.navigate(Routes.orderDetailRoute(orderId))
                     }
                 )
             }
-
             composable(
-                route = Routes.ORDER_DETAIL,
+                route     = Routes.ORDER_DETAIL,
                 arguments = listOf(navArgument("orderId") { type = NavType.StringType })
             ) { backStack ->
                 val orderId = backStack.arguments?.getString("orderId") ?: ""
                 OrderDetailScreen(
                     orderId = orderId,
-                    onBack = { navController.popBackStack() }
+                    onBack  = { navController.popBackStack() }
                 )
             }
         }

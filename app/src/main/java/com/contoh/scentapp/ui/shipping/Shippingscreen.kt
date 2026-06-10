@@ -10,13 +10,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.Money
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,99 +34,137 @@ import com.contoh.scentapp.ui.theme.*
 
 @Composable
 fun ShippingScreen(
-    onBack: () -> Unit = {},
-    onConfirm: (isTransfer: Boolean) -> Unit = {}
+    onBack       : () -> Unit = {},
+    onCODSuccess : () -> Unit = {},
+    onTransfer   : () -> Unit = {}
 ) {
-    val repository = CartRepository.getInstance()
-    val listState = rememberLazyListState()
-    var selectedId by rememberSaveable { mutableStateOf("jnt") }
+    val repository    = CartRepository.getInstance()
+    val listState     = rememberLazyListState()
+
+    var selectedKurirId by rememberSaveable { mutableStateOf("jnt") }
+    var selectedPayment by rememberSaveable { mutableStateOf("") }
+
     val shippingOptions = repository.shippingOptions
-    val selectedOption = shippingOptions.find { it.id == selectedId } ?: shippingOptions.first()
-    var isTransfer by rememberSaveable { mutableStateOf(false) }
-    val cartItems = repository.cartItems
-    val subtotal = 0
+    val selectedOption  = shippingOptions.find { it.id == selectedKurirId }
+        ?: shippingOptions.first()
+
+    val subtotal    = 1_450_000
     val shippingFee = selectedOption.price
-    val total = subtotal + shippingFee
+    val total       = subtotal + shippingFee
 
     fun formatRp(value: Int) = "Rp ${"%,d".format(value).replace(",", ".")}"
 
+    // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
+            state          = listState,
+            modifier       = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 120.dp)
         ) {
+            // ── Top Bar ───────────────────────────────────────────────────────
             item(key = "topbar") {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
                         .padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment     = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Kembali",
-                        tint = ScentWhite,
-                        modifier = Modifier
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        tint               = MaterialTheme.colorScheme.onBackground,
+                        modifier           = Modifier
                             .size(24.dp)
                             .clickable(onClick = onBack)
                     )
                     Text(
-                        text = "SCENT",
+                        text  = "SCENT",
                         style = MaterialTheme.typography.titleLarge.copy(
                             letterSpacing = 6.sp,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize      = 18.sp,
+                            fontWeight    = FontWeight.Bold
                         ),
-                        color = ScentWhite
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                }
-            }
-            item(key = "header") {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp
-                    )
-                ) {
                     Text(
-                        text = "Opsi Pengiriman",
-                        style = MaterialTheme.typography.displayMedium.copy(
-                            fontWeight = FontWeight.Bold, fontSize = 28.sp
-                        ),
-                        color = ScentWhite
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Pilih layanan kurir dan metode pembayaran untuk pesanan Anda.",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = ScentTextMuted, lineHeight = 22.sp
+                        text  = "Checkout",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = ScentTextMuted
                         )
                     )
                 }
             }
+
+            // ── Header ────────────────────────────────────────────────────────
+            item(key = "header") {
+                Column(
+                    modifier = Modifier.padding(
+                        start  = 20.dp,
+                        end    = 20.dp,
+                        top    = 8.dp,
+                        bottom = 24.dp
+                    )
+                ) {
+                    Text(
+                        text  = "Metode Pengiriman",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize   = 26.sp
+                        ),
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text  = "Pilih kurir dan metode pembayaran untuk pesanan Anda.",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color      = ScentTextMuted,
+                            lineHeight = 22.sp
+                        )
+                    )
+                }
+            }
+
+            // ── Pilihan Kurir ─────────────────────────────────────────────────
+            item(key = "kurir_label") {
+                ShippingSectionLabel(
+                    text     = "PILIH KURIR",
+                    modifier = Modifier.padding(
+                        start  = 20.dp,
+                        end    = 20.dp,
+                        bottom = 12.dp
+                    )
+                )
+            }
+
             items(
                 count = shippingOptions.size,
-                key = { shippingOptions[it].id }
+                key   = { shippingOptions[it].id }
             ) { index ->
-                val option = shippingOptions[index]
-                val isSelected = option.id == selectedId
+                val option     = shippingOptions[index]
+                val isSelected = option.id == selectedKurirId
 
                 val borderColor by animateColorAsState(
-                    targetValue = if (isSelected) ScentWhite else Color.Transparent,
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    targetValue   = if (isSelected) MaterialTheme.colorScheme.onBackground else Color.Transparent,
                     animationSpec = tween(200),
-                    label = "border_${option.id}"
+                    label         = "kurirBorder_${option.id}"
                 )
                 val bgColor by animateColorAsState(
-                    targetValue = if (isSelected) ScentSearchBg else Color(0xFF161616),
+                    // ✅ FIX: Ganti ScentSearchBg → MaterialTheme.colorScheme.surfaceVariant
+                    targetValue   = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
                     animationSpec = tween(200),
-                    label = "bg_${option.id}"
+                    label         = "kurirBg_${option.id}"
                 )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,7 +172,7 @@ fun ShippingScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .background(bgColor)
                         .border(1.dp, borderColor, RoundedCornerShape(12.dp))
-                        .clickable { selectedId = option.id }
+                        .clickable { selectedKurirId = option.id }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -142,123 +180,175 @@ fun ShippingScreen(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF222222)),
+                            // ✅ FIX: Ganti hardcode → MaterialTheme.colorScheme.surfaceVariant
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = iconForType(option.iconType),
+                            imageVector        = iconForKurir(option.iconType),
                             contentDescription = option.name,
-                            tint = ScentWhite,
-                            modifier = Modifier.size(22.dp)
+                            // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                            tint               = MaterialTheme.colorScheme.onBackground,
+                            modifier           = Modifier.size(22.dp)
                         )
                     }
                     Spacer(Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = option.name,
+                                text  = option.name,
                                 style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold, fontSize = 15.sp
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize   = 15.sp
                                 ),
-                                color = ScentWhite
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                             Spacer(Modifier.width(8.dp))
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .background(Color(0xFF2A2A2A))
+                                    // ✅ FIX: Ganti hardcode → MaterialTheme.colorScheme.surfaceVariant
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             ) {
                                 Text(
-                                    text = option.badge,
+                                    text  = option.badge,
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        fontSize = 8.sp, letterSpacing = 1.sp, color = ScentTextMuted
+                                        fontSize      = 8.sp,
+                                        letterSpacing = 1.sp,
+                                        color         = ScentTextMuted
                                     )
                                 )
                             }
                         }
                         Spacer(Modifier.height(3.dp))
                         Text(
-                            text = option.estimasi,
-                            style = MaterialTheme.typography.bodySmall.copy(color = ScentTextMuted)
+                            text  = option.estimasi,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = ScentTextMuted
+                            )
                         )
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = option.formattedPrice,
+                            text  = option.formattedPrice,
                             style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold, fontSize = 14.sp, color = ScentWhite
+                                fontWeight = FontWeight.Bold,
+                                fontSize   = 14.sp,
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color      = MaterialTheme.colorScheme.onBackground
                             )
                         )
                         Spacer(Modifier.height(8.dp))
                         RadioButton(
                             selected = isSelected,
-                            onClick = { selectedId = option.id },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = ScentWhite, unselectedColor = ScentTextMuted
+                            onClick  = { selectedKurirId = option.id },
+                            colors   = RadioButtonDefaults.colors(
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                selectedColor   = MaterialTheme.colorScheme.onBackground,
+                                unselectedColor = ScentTextMuted
                             )
                         )
                     }
                 }
             }
-            item(key = "payment_method") {
-                Spacer(Modifier.height(24.dp))
-                Text(
-                    text = "METODE PEMBAYARAN",
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 10.sp,
-                        letterSpacing = 2.sp,
-                        color = ScentTextLabel
+
+            // ── Metode Pembayaran ─────────────────────────────────────────────
+            item(key = "payment_label") {
+                Spacer(Modifier.height(20.dp))
+                ShippingSectionLabel(
+                    text     = "METODE PEMBAYARAN",
+                    modifier = Modifier.padding(
+                        start  = 20.dp,
+                        end    = 20.dp,
+                        bottom = 12.dp
                     )
-                )
-                PaymentOptionRow(
-                    title = "Bayar di Tempat (COD)",
-                    desc = "Bayar saat pesanan tiba",
-                    icon = Icons.Default.Payments,
-                    isSelected = !isTransfer,
-                    onClick = { isTransfer = false }
-                )
-                PaymentOptionRow(
-                    title = "Transfer Bank",
-                    desc = "Upload bukti transfer",
-                    icon = Icons.Default.AccountBalance,
-                    isSelected = isTransfer,
-                    onClick = { isTransfer = true }
                 )
             }
-            item(key = "order_detail") {
-                Spacer(Modifier.height(24.dp))
-                HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 20.dp))
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp)) {
-                    Text(
-                        text = "DETAIL PESANAN",
-                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, letterSpacing = 2.sp, color = ScentTextLabel)
+
+            // COD
+            item(key = "cod") {
+                PaymentOptionCard(
+                    icon       = Icons.Default.Money,
+                    title      = "COD (Bayar di Tempat)",
+                    subtitle   = "Bayar tunai saat bertemu langsung dengan penjual",
+                    isSelected = selectedPayment == "cod",
+                    onClick    = { selectedPayment = "cod" },
+                    modifier   = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                )
+            }
+
+            // Transfer
+            item(key = "transfer") {
+                PaymentOptionCard(
+                    icon       = Icons.Default.AccountBalance,
+                    title      = "Transfer Bank",
+                    subtitle   = "Transfer ke rekening penjual & upload bukti pembayaran",
+                    isSelected = selectedPayment == "transfer",
+                    onClick    = { selectedPayment = "transfer" },
+                    modifier   = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                )
+            }
+
+            // ── Detail Pesanan ────────────────────────────────────────────────
+            item(key = "order_summary") {
+                Spacer(Modifier.height(20.dp))
+                HorizontalDivider(
+                    color     = ScentDivider,
+                    thickness = 0.5.dp,
+                    modifier  = Modifier.padding(horizontal = 20.dp)
+                )
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = 20.dp,
+                        vertical   = 20.dp
                     )
+                ) {
+                    ShippingSectionLabel(text = "DETAIL PESANAN")
                     Spacer(Modifier.height(16.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Subtotal Produk", style = MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted))
-                        Text(formatRp(subtotal), style = MaterialTheme.typography.bodyMedium.copy(color = ScentWhite))
-                    }
+                    OrderSummaryRow("Subtotal Produk",  formatRp(subtotal))
                     Spacer(Modifier.height(10.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Biaya Pengiriman", style = MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted))
-                        Text(formatRp(shippingFee), style = MaterialTheme.typography.bodyMedium.copy(color = ScentWhite))
-                    }
-                    HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 16.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Total Tagihan", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ScentWhite))
-                        Text(formatRp(total), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp, color = ScentWhite))
+                    OrderSummaryRow("Biaya Pengiriman", formatRp(shippingFee))
+                    HorizontalDivider(
+                        color     = ScentDivider,
+                        thickness = 0.5.dp,
+                        modifier  = Modifier.padding(vertical = 16.dp)
+                    )
+                    Row(
+                        modifier              = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment     = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text  = "Total Tagihan",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color      = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
+                        Text(
+                            text  = formatRp(total),
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize   = 20.sp,
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color      = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
                     }
                 }
             }
         }
 
+        // ── Tombol Lanjutkan (sticky bottom) ──────────────────────────────────
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(ScentBlack)
+                // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
                 .navigationBarsPadding()
         ) {
@@ -266,45 +356,65 @@ fun ShippingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(ScentWhite)
-                    .clickable(onClick = { onConfirm(isTransfer) })
+                    .background(
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        if (selectedPayment.isNotEmpty()) MaterialTheme.colorScheme.onBackground
+                        else MaterialTheme.colorScheme.surfaceVariant
+                    )
+                    .clickable(enabled = selectedPayment.isNotEmpty()) {
+                        when (selectedPayment) {
+                            "cod"      -> onCODSuccess()
+                            "transfer" -> onTransfer()
+                        }
+                    }
                     .padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "LANJUTKAN PESANAN",
+                    text = when (selectedPayment) {
+                        "transfer" -> "LANJUT UPLOAD BUKTI"
+                        "cod"      -> "KONFIRMASI PESANAN"
+                        else       -> "PILIH METODE PEMBAYARAN"
+                    },
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 12.sp,
+                        fontSize      = 12.sp,
                         letterSpacing = 2.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ScentBlack
+                        fontWeight    = FontWeight.Bold,
+                        // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                        color         = if (selectedPayment.isNotEmpty()) MaterialTheme.colorScheme.background
+                        else ScentTextMuted
                     )
                 )
             }
         }
     }
 }
+
+// ── Payment Option Card ───────────────────────────────────────────────────────
+
 @Composable
-fun PaymentOptionRow(
-    title: String,
-    desc: String,
-    icon: ImageVector,
-    isSelected: Boolean,
-    onClick: () -> Unit
+private fun PaymentOptionCard(
+    icon       : ImageVector,
+    title      : String,
+    subtitle   : String,
+    isSelected : Boolean,
+    onClick    : () -> Unit,
+    modifier   : Modifier = Modifier
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) ScentWhite else Color.Transparent,
-        animationSpec = tween(200), label = "border_$title"
+        targetValue   = if (isSelected) ScentGold else ScentDivider,
+        animationSpec = tween(200),
+        label         = "payBorder_$title"
     )
     val bgColor by animateColorAsState(
-        targetValue = if (isSelected) ScentSearchBg else Color(0xFF161616),
-        animationSpec = tween(200), label = "bg_$title"
+        targetValue   = if (isSelected) ScentGold.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface,
+        animationSpec = tween(200),
+        label         = "payBg_$title"
     )
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(bgColor)
             .border(1.dp, borderColor, RoundedCornerShape(12.dp))
@@ -312,41 +422,88 @@ fun PaymentOptionRow(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = ScentWhite,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(Modifier.width(16.dp))
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(8.dp))
+                // ✅ FIX: Ganti hardcode → MaterialTheme.colorScheme.surfaceVariant
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector        = icon,
+                contentDescription = title,
+                tint               = if (isSelected) ScentGold else ScentTextMuted,
+                modifier           = Modifier.size(22.dp)
+            )
+        }
+        Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = title,
+                text  = title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold, fontSize = 15.sp
+                    fontWeight = FontWeight.Bold,
+                    fontSize   = 14.sp
                 ),
-                color = ScentWhite
+                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(3.dp))
             Text(
-                text = desc,
-                style = MaterialTheme.typography.bodySmall.copy(color = ScentTextMuted)
+                text  = subtitle,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color      = ScentTextMuted,
+                    lineHeight = 18.sp
+                )
             )
         }
         RadioButton(
             selected = isSelected,
-            onClick = onClick,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = ScentWhite, unselectedColor = ScentTextMuted
+            onClick  = onClick,
+            colors   = RadioButtonDefaults.colors(
+                selectedColor   = ScentGold,
+                unselectedColor = ScentTextMuted
             )
         )
     }
 }
 
 @Composable
-private fun iconForType(type: String): ImageVector = when (type) {
+private fun ShippingSectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text     = text,
+        modifier = modifier,
+        style    = MaterialTheme.typography.labelSmall.copy(
+            fontSize      = 10.sp,
+            letterSpacing = 2.sp,
+            color         = ScentTextLabel
+        )
+    )
+}
+
+@Composable
+private fun OrderSummaryRow(label: String, value: String) {
+    Row(
+        modifier              = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text  = label,
+            // ✅ FIX: Ganti ScentTextMuted → MaterialTheme.colorScheme.onBackground untuk label
+            style = MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted)
+        )
+        Text(
+            text  = value,
+            // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground)
+        )
+    }
+}
+
+@Composable
+private fun iconForKurir(type: String): ImageVector = when (type) {
     "lightning" -> Icons.Default.FlashOn
-    "plane" -> Icons.Default.Flight
-    "bike" -> Icons.Default.DirectionsBike
-    else -> Icons.Default.LocalShipping
+    "plane"     -> Icons.Default.Flight
+    "bike"      -> Icons.Default.DirectionsBike
+    else        -> Icons.Default.LocalShipping
 }

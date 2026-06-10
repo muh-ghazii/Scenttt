@@ -40,7 +40,8 @@ fun OrderSuccessScreen(
     val metodeIcon = if (isTransfer) Icons.Default.AccountBalance else Icons.Default.Money
 
     Box(
-        modifier = Modifier.fillMaxSize().background(ScentBlack)
+        // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
@@ -54,7 +55,8 @@ fun OrderSuccessScreen(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Tutup",
-                    tint = ScentWhite,
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp).clickable(onClick = onBackHome)
                 )
                 Text(
@@ -62,19 +64,23 @@ fun OrderSuccessScreen(
                     style = MaterialTheme.typography.titleLarge.copy(
                         letterSpacing = 6.sp, fontSize = 18.sp, fontWeight = FontWeight.Bold
                     ),
-                    color = ScentWhite
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.size(24.dp))
             }
             Spacer(Modifier.height(32.dp))
             Box(
-                modifier = Modifier.size(120.dp).clip(RoundedCornerShape(20.dp)).background(Color(0xFF1C1C1C)),
+                modifier = Modifier.size(120.dp).clip(RoundedCornerShape(20.dp))
+                    // ✅ FIX: Ganti hardcode → MaterialTheme.colorScheme.surfaceVariant
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Berhasil",
-                    tint = ScentWhite,
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(56.dp)
                 )
             }
@@ -84,7 +90,9 @@ fun OrderSuccessScreen(
                 style = MaterialTheme.typography.displayMedium.copy(
                     fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 36.sp
                 ),
-                color = ScentWhite, textAlign = TextAlign.Center
+                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(14.dp))
             Text(
@@ -97,7 +105,10 @@ fun OrderSuccessScreen(
             Spacer(Modifier.height(32.dp))
 
             Column(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFF161616)).padding(20.dp)
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                    // ✅ FIX: Ganti hardcode → MaterialTheme.colorScheme.surfaceVariant
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(20.dp)
             ) {
                 OrderDetailRow(label = "ORDER ID", value = orderId, isLabelSmall = true)
                 HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 16.dp))
@@ -120,7 +131,9 @@ fun OrderSuccessScreen(
                         Text(
                             text = metodeText,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = ScentWhite, fontWeight = FontWeight.Medium
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontWeight = FontWeight.Medium
                             )
                         )
                     }
@@ -145,7 +158,9 @@ fun OrderSuccessScreen(
                         Text(
                             text = estimasi,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = ScentWhite, fontWeight = FontWeight.Medium
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontWeight = FontWeight.Medium
                             )
                         )
                     }
@@ -158,26 +173,44 @@ fun OrderSuccessScreen(
                 ) {
                     Text(
                         text = "Total Pembayaran",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ScentWhite)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                     Text(
                         text = totalPayment,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontSize = 22.sp, color = ScentWhite)
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold, fontSize = 22.sp,
+                            // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     )
                 }
             }
         }
         Box(
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().background(ScentBlack).padding(horizontal = 20.dp, vertical = 16.dp).navigationBarsPadding()
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .navigationBarsPadding()
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(ScentWhite).clickable(onClick = onBackHome).padding(vertical = 18.dp),
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    .background(MaterialTheme.colorScheme.onBackground)
+                    .clickable(onClick = onBackHome)
+                    .padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "KEMBALI KE BERANDA",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold, color = ScentBlack
+                        fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
+                        // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.background
                     )
                 )
             }
@@ -194,12 +227,18 @@ private fun OrderDetailRow(label: String, value: String, isLabelSmall: Boolean =
     ) {
         Text(
             text = label,
-            style = if (isLabelSmall) MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel)
+            style = if (isLabelSmall) MaterialTheme.typography.labelSmall.copy(
+                fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel
+            )
             else MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted)
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = ScentWhite)
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
+            )
         )
     }
 }

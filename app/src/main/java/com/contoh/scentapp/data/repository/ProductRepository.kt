@@ -4,6 +4,7 @@ import com.contoh.scentapp.data.model.AromaFilter
 import com.contoh.scentapp.data.model.HeroBanner
 import com.contoh.scentapp.data.model.Product
 import com.contoh.scentapp.data.model.Review
+import com.contoh.scentapp.data.model.SalesProduct
 import com.contoh.scentapp.data.model.SizeOption
 import com.contoh.scentapp.data.model.UsageFilter
 import kotlinx.coroutines.flow.Flow
@@ -152,6 +153,71 @@ class ProductRepository private constructor() {
             )
         )
     )
+
+    // ── ✅ TAMBAHAN: SalesProduct state ──────────────────────────────────────
+    private val _salesProducts = MutableStateFlow(
+        listOf(
+            SalesProduct(
+                id          = 201,
+                name        = "NOCTURNAL OUD",
+                aromaFamily = "WOODY",
+                volume      = "100ML",
+                stockStatus = "TERSEDIA",
+                price       = 285_000,
+                stock       = 24,
+                cardColor   = 0xFF1A1A1A,
+                accentColor = 0xFFD4A853
+            ),
+            SalesProduct(
+                id          = 202,
+                name        = "ETHEREAL MIST",
+                aromaFamily = "FLORAL",
+                volume      = "50ML",
+                stockStatus = "STOK MENIPIS",
+                price       = 195_000,
+                stock       = 3,
+                cardColor   = 0xFF1A2020,
+                accentColor = 0xFF8BA0B0
+            )
+        )
+    )
+
+    val salesProducts: Flow<List<SalesProduct>> = _salesProducts.asStateFlow()
+
+    // ── ✅ TAMBAHAN: addProduct & deleteProduct ───────────────────────────────
+
+    fun addProduct(salesProduct: SalesProduct) {
+        // Tambah ke daftar sales
+        _salesProducts.update { it + salesProduct }
+        // Konversi dan tambah ke daftar home → langsung muncul di beranda
+        _products.update { it + salesProduct.toProduct() }
+    }
+
+    fun deleteProduct(productId: Int) {
+        _salesProducts.update { list -> list.filter { it.id != productId } }
+        _products.update     { list -> list.filter { it.id != productId } }
+    }
+
+    // ── Mapping SalesProduct → Product ──────────────────────────────────────
+    private fun SalesProduct.toProduct() = Product(
+        id           = id,
+        brand        = "SCENT",
+        name         = name,
+        price        = "Rp %,d".format(price).replace(",", "."),
+        volume       = volume.lowercase(),
+        cardColor    = cardColor,
+        accentColor  = accentColor,
+        collection   = "KOLEKSI BARU",
+        fullBrand    = "Oleh Scent Atelier",
+        description  = "Aroma $aromaFamily yang memukau.",
+        aromaProfile = listOf(aromaFamily),
+        usage        = "KEDUANYA",
+        rating       = 0f,
+        reviewCount  = 0,
+        isFavorite   = false
+    )
+
+    // ── Fungsi lama (tidak diubah) ────────────────────────────────────────────
 
     val products: Flow<List<Product>> = _products.asStateFlow()
 

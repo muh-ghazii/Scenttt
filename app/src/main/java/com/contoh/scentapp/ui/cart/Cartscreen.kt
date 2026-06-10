@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
@@ -30,10 +29,10 @@ import com.contoh.scentapp.ui.theme.*
 
 @Composable
 fun CartScreen(
-    onBack            : () -> Unit = {},
-    onCheckout        : () -> Unit = {},
-    onContinueShopping: () -> Unit = {},
-    viewModel         : CartViewModel = viewModel(factory = CartViewModelFactory())
+    onBack             : () -> Unit = {},
+    onCheckout         : () -> Unit = {},
+    onContinueShopping : () -> Unit = {},
+    viewModel          : CartViewModel = viewModel(factory = CartViewModelFactory())
 ) {
     val uiState   by viewModel.uiState.collectAsStateWithLifecycle()
     val listState  = rememberLazyListState()
@@ -41,7 +40,7 @@ fun CartScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             state          = listState,
@@ -49,35 +48,21 @@ fun CartScreen(
             contentPadding = PaddingValues(bottom = 140.dp)
         ) {
             item(key = "topbar") {
-                CartTopBar(
-                    itemCount = uiState.totalItems,
-                    onBack    = onBack
-                )
+                CartTopBar(itemCount = uiState.totalItems, onBack = onBack)
             }
             item(key = "header") {
                 CartHeader(
                     subtitle = uiState.headerSubtitle,
-                    modifier = Modifier.padding(
-                        start  = 20.dp,
-                        end    = 20.dp,
-                        top    = 8.dp,
-                        bottom = 24.dp
-                    )
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp)
                 )
             }
-            items(
-                items = uiState.items,
-                key   = { "cart_${it.productId}" }
-            ) { item ->
+            items(items = uiState.items, key = { "cart_${it.productId}" }) { item ->
                 CartItemCard(
                     item       = item,
                     onIncrease = { viewModel.increaseQty(item.productId) },
                     onDecrease = { viewModel.decreaseQty(item.productId) },
                     onDelete   = { viewModel.removeItem(item.productId) },
-                    modifier   = Modifier.padding(
-                        horizontal = 20.dp,
-                        vertical   = 8.dp
-                    )
+                    modifier   = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                 )
                 HorizontalDivider(
                     color     = ScentDivider,
@@ -88,17 +73,18 @@ fun CartScreen(
             item(key = "summary") {
                 Spacer(Modifier.height(32.dp))
                 CartSummary(
-                    subtotal  = uiState.formattedSubtotal,
-                    total     = uiState.formattedTotal,
-                    modifier  = Modifier.padding(horizontal = 20.dp)
+                    subtotal = uiState.formattedSubtotal,
+                    total    = uiState.formattedTotal,
+                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(ScentBlack)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
                 .navigationBarsPadding()
         ) {
@@ -106,7 +92,7 @@ fun CartScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(ScentWhite)
+                    .background(MaterialTheme.colorScheme.onBackground)
                     .clickable(onClick = onCheckout)
                     .padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
@@ -117,7 +103,7 @@ fun CartScreen(
                         fontSize      = 12.sp,
                         letterSpacing = 2.sp,
                         fontWeight    = FontWeight.Bold,
-                        color         = ScentBlack
+                        color         = MaterialTheme.colorScheme.background
                     )
                 )
             }
@@ -137,7 +123,7 @@ fun CartScreen(
                         fontSize      = 12.sp,
                         letterSpacing = 2.sp,
                         fontWeight    = FontWeight.Bold,
-                        color         = ScentWhite
+                        color         = MaterialTheme.colorScheme.onBackground
                     )
                 )
             }
@@ -158,25 +144,21 @@ private fun CartTopBar(itemCount: Int, onBack: () -> Unit) {
         Icon(
             imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Kembali",
-            tint               = ScentWhite,
-            modifier           = Modifier
-                .size(24.dp)
-                .clickable(onClick = onBack)
+            tint               = MaterialTheme.colorScheme.onBackground,
+            modifier           = Modifier.size(24.dp).clickable(onClick = onBack)
         )
         Text(
             text  = "SCENT",
             style = MaterialTheme.typography.titleLarge.copy(
-                letterSpacing = 6.sp,
-                fontSize      = 18.sp,
-                fontWeight    = FontWeight.Bold
+                letterSpacing = 6.sp, fontSize = 18.sp, fontWeight = FontWeight.Bold
             ),
-            color = ScentWhite
+            color = MaterialTheme.colorScheme.onBackground
         )
         Box {
             Icon(
                 imageVector        = Icons.Default.ShoppingBag,
                 contentDescription = "Keranjang",
-                tint               = ScentWhite,
+                tint               = MaterialTheme.colorScheme.onBackground,
                 modifier           = Modifier.size(24.dp)
             )
             if (itemCount > 0) {
@@ -198,18 +180,15 @@ private fun CartHeader(subtitle: String, modifier: Modifier = Modifier) {
         Text(
             text  = "PILIHAN SAYA",
             style = MaterialTheme.typography.displayMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize   = 32.sp
+                fontWeight = FontWeight.Bold, fontSize = 32.sp
             ),
-            color = ScentWhite
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text  = subtitle,
             style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                color         = ScentTextLabel,
-                fontSize      = 11.sp
+                letterSpacing = 2.sp, color = ScentTextLabel, fontSize = 11.sp
             )
         )
     }
@@ -252,15 +231,10 @@ private fun CartItemCard(
                         .width(36.dp).height(60.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(Color(item.accentColor).copy(alpha = 0.2f))
-                        .border(
-                            0.5.dp,
-                            Color(item.accentColor).copy(alpha = 0.4f),
-                            RoundedCornerShape(4.dp)
-                        )
+                        .border(0.5.dp, Color(item.accentColor).copy(alpha = 0.4f), RoundedCornerShape(4.dp))
                 )
             }
         }
-
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Row(
@@ -272,17 +246,15 @@ private fun CartItemCard(
                     Text(
                         text  = item.name,
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 16.sp
+                            fontWeight = FontWeight.Bold, fontSize = 16.sp
                         ),
-                        color = ScentWhite
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         text  = "${item.aromaProfile} • ${item.volume}",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color      = ScentTextMuted,
-                            lineHeight = 18.sp
+                            color = ScentTextMuted, lineHeight = 18.sp
                         )
                     )
                 }
@@ -290,33 +262,25 @@ private fun CartItemCard(
                     imageVector        = Icons.Default.Delete,
                     contentDescription = "Hapus",
                     tint               = ScentTextMuted,
-                    modifier           = Modifier
-                        .size(20.dp)
-                        .clickable(onClick = onDelete)
+                    modifier           = Modifier.size(20.dp).clickable(onClick = onDelete)
                 )
             }
-
             Spacer(Modifier.height(16.dp))
-            Row(
-                modifier          = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(ScentSearchBg),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clickable(onClick = onDecrease),
+                        modifier = Modifier.size(40.dp).clickable(onClick = onDecrease),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text  = "−",
                             style = MaterialTheme.typography.titleMedium.copy(
-                                color = ScentWhite
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         )
                     }
@@ -324,31 +288,28 @@ private fun CartItemCard(
                         text  = item.quantity.toString(),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color      = ScentWhite
+                            color      = MaterialTheme.colorScheme.onBackground
                         ),
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clickable(onClick = onIncrease),
+                        modifier = Modifier.size(40.dp).clickable(onClick = onIncrease),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text  = "+",
                             style = MaterialTheme.typography.titleMedium.copy(
-                                color = ScentWhite
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         )
                     }
                 }
-
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text  = item.formattedPrice,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Medium,
-                        color      = ScentWhite
+                        color      = MaterialTheme.colorScheme.onBackground
                     )
                 )
             }
@@ -357,61 +318,38 @@ private fun CartItemCard(
 }
 
 @Composable
-private fun CartSummary(
-    subtotal : String,
-    total    : String,
-    modifier : Modifier = Modifier
-) {
+private fun CartSummary(subtotal: String, total: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 text  = "SUBTOTAL",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    color         = ScentTextLabel,
-                    fontSize      = 11.sp
+                    letterSpacing = 2.sp, color = ScentTextLabel, fontSize = 11.sp
                 )
             )
             Text(
                 text  = subtotal.uppercase(),
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 1.sp,
-                    color         = ScentTextMuted,
-                    fontSize      = 11.sp
+                    letterSpacing = 1.sp, color = ScentTextMuted, fontSize = 11.sp
                 )
             )
         }
         Spacer(Modifier.height(12.dp))
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 text  = "PENGIRIMAN ATELIER",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    color         = ScentTextLabel,
-                    fontSize      = 11.sp
+                    letterSpacing = 2.sp, color = ScentTextLabel, fontSize = 11.sp
                 )
             )
             Text(
                 text  = "GRATIS",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 1.sp,
-                    color         = ScentTextMuted,
-                    fontSize      = 11.sp
+                    letterSpacing = 1.sp, color = ScentTextMuted, fontSize = 11.sp
                 )
             )
         }
-
-        HorizontalDivider(
-            color     = ScentDivider,
-            thickness = 0.5.dp,
-            modifier  = Modifier.padding(vertical = 20.dp)
-        )
+        HorizontalDivider(color = ScentDivider, thickness = 0.5.dp, modifier = Modifier.padding(vertical = 20.dp))
         Row(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -420,18 +358,15 @@ private fun CartSummary(
             Text(
                 text  = "ESTIMASI TOTAL",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    color         = ScentTextLabel,
-                    fontSize      = 11.sp
+                    letterSpacing = 2.sp, color = ScentTextLabel, fontSize = 11.sp
                 )
             )
             Text(
                 text  = total,
                 style = MaterialTheme.typography.displayMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = 28.sp
+                    fontWeight = FontWeight.Bold, fontSize = 28.sp
                 ),
-                color = ScentWhite
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }

@@ -14,7 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -31,13 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.contoh.scentapp.data.model.Product
-import com.contoh.scentapp.ui.theme.ScentBlack
-import com.contoh.scentapp.ui.theme.ScentDivider
-import com.contoh.scentapp.ui.theme.ScentGold
-import com.contoh.scentapp.ui.theme.ScentSearchBg
-import com.contoh.scentapp.ui.theme.ScentTextLabel
-import com.contoh.scentapp.ui.theme.ScentTextMuted
-import com.contoh.scentapp.ui.theme.ScentWhite
+import com.contoh.scentapp.ui.theme.*
 
 @Composable
 fun FavoriteScreen(
@@ -51,39 +45,27 @@ fun FavoriteScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             state          = listState,
             modifier       = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 40.dp)
         ) {
-            item(key = "topbar") {
-                FavoriteTopBar(onBack = onBack)
-            }
+            item(key = "topbar") { FavoriteTopBar(onBack = onBack) }
             item(key = "header") {
                 FavoriteHeader(
-                    modifier = Modifier.padding(
-                        start  = 20.dp,
-                        end    = 20.dp,
-                        top    = 8.dp,
-                        bottom = 24.dp
-                    )
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp)
                 )
             }
             if (uiState.isEmpty && !uiState.isLoading) {
                 item(key = "empty") {
                     EmptyFavoriteState(
-                        modifier = Modifier
-                            .fillParentMaxWidth()
-                            .padding(top = 60.dp)
+                        modifier = Modifier.fillParentMaxWidth().padding(top = 60.dp)
                     )
                 }
             }
-            items(
-                items = uiState.favorites,
-                key   = { product -> "fav_${product.id}" }
-            ) { product ->
+            items(items = uiState.favorites, key = { product -> "fav_${product.id}" }) { product ->
                 AnimatedVisibility(
                     visible = true,
                     enter   = fadeIn() + slideInVertically(),
@@ -93,10 +75,7 @@ fun FavoriteScreen(
                         product        = product,
                         onProductClick = { onProductClick(product.id) },
                         onRemove       = { viewModel.removeFromFavorite(product.id) },
-                        modifier       = Modifier.padding(
-                            horizontal = 20.dp,
-                            vertical   = 4.dp
-                        )
+                        modifier       = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
                     )
                 }
                 HorizontalDivider(
@@ -120,21 +99,17 @@ private fun FavoriteTopBar(onBack: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Icon(
-            imageVector        = Icons.Default.ArrowBack,
+            imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Kembali",
-            tint               = ScentWhite,
-            modifier           = Modifier
-                .size(24.dp)
-                .clickable(onClick = onBack)
+            tint               = MaterialTheme.colorScheme.onBackground,
+            modifier           = Modifier.size(24.dp).clickable(onClick = onBack)
         )
         Text(
             text  = "SCENT",
             style = MaterialTheme.typography.titleLarge.copy(
-                letterSpacing = 6.sp,
-                fontSize      = 18.sp,
-                fontWeight    = FontWeight.Bold
+                letterSpacing = 6.sp, fontSize = 18.sp, fontWeight = FontWeight.Bold
             ),
-            color = ScentWhite
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.size(24.dp))
     }
@@ -146,19 +121,14 @@ private fun FavoriteHeader(modifier: Modifier = Modifier) {
         Text(
             text  = "Kurasi Anda.",
             style = MaterialTheme.typography.displayMedium.copy(
-                fontWeight  = FontWeight.Bold,
-                fontSize    = 36.sp,
-                lineHeight  = 42.sp,
+                fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 42.sp
             ),
-            color = ScentWhite
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(10.dp))
         Text(
             text  = "Koleksi wewangian terpilih yang mencerminkan identitas dan karakter personal Anda.",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color      = ScentTextMuted,
-                lineHeight = 22.sp
-            )
+            style = MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted, lineHeight = 22.sp)
         )
     }
 }
@@ -179,20 +149,14 @@ private fun EmptyFavoriteState(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(20.dp))
         Text(
             text      = "Koleksi Favorit Kosong",
-            style     = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize   = 18.sp
-            ),
-            color     = ScentWhite,
+            style     = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp),
+            color     = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text      = "Tekan ikon pada parfum\nuntuk menyimpannya di sini",
-            style     = MaterialTheme.typography.bodyMedium.copy(
-                color      = ScentTextMuted,
-                lineHeight = 22.sp
-            ),
+            style     = MaterialTheme.typography.bodyMedium.copy(color = ScentTextMuted, lineHeight = 22.sp),
             textAlign = TextAlign.Center
         )
     }
@@ -213,10 +177,7 @@ private fun FavoriteItemCard(
         verticalAlignment     = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier          = Modifier.weight(1f)
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -234,61 +195,45 @@ private fun FavoriteItemCard(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
-                            .width(8.dp)
-                            .height(6.dp)
+                            .width(8.dp).height(6.dp)
                             .background(Color(product.accentColor).copy(alpha = 0.5f))
                     )
                     Box(
                         modifier = Modifier
-                            .width(24.dp)
-                            .height(40.dp)
+                            .width(24.dp).height(40.dp)
                             .clip(RoundedCornerShape(3.dp))
                             .background(Color(product.accentColor).copy(alpha = 0.25f))
-                            .border(
-                                0.5.dp,
-                                Color(product.accentColor).copy(alpha = 0.4f),
-                                RoundedCornerShape(3.dp)
-                            )
+                            .border(0.5.dp, Color(product.accentColor).copy(alpha = 0.4f), RoundedCornerShape(3.dp))
                     )
                 }
             }
-
             Spacer(Modifier.width(16.dp))
-
-            // Info produk
             Column {
                 Text(
                     text  = product.collection.ifBlank { product.brand },
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize      = 10.sp,
-                        letterSpacing = 1.5.sp,
-                        color         = ScentTextLabel
+                        fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel
                     )
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text  = product.name.uppercase(),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize   = 18.sp,
-                        lineHeight = 22.sp
+                        fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 22.sp
                     ),
-                    color = ScentWhite
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
                     text  = product.price,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color      = ScentTextMuted,
-                        fontWeight = FontWeight.Normal
+                        color = ScentTextMuted, fontWeight = FontWeight.Normal
                     )
                 )
             }
         }
         Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clickable(onClick = onRemove),
+            modifier = Modifier.size(32.dp).clickable(onClick = onRemove),
             contentAlignment = Alignment.Center
         ) {
             Icon(

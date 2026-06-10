@@ -29,7 +29,8 @@ fun UploadPaymentProofScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -46,7 +47,8 @@ fun UploadPaymentProofScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Kembali",
-                    tint = ScentWhite,
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable(onClick = onBack)
@@ -58,7 +60,8 @@ fun UploadPaymentProofScreen(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp
                     ),
-                    color = ScentWhite
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
@@ -69,7 +72,8 @@ fun UploadPaymentProofScreen(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = ScentWhite
+                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -87,10 +91,12 @@ fun UploadPaymentProofScreen(
                     .fillMaxWidth()
                     .height(200.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF161616))
+                    // ✅ FIX: Ganti Color(0xFF161616) → MaterialTheme.colorScheme.surfaceVariant
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
                     .border(
                         width = 1.dp,
-                        color = if (isUploaded) ScentWhite else ScentDivider,
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = if (isUploaded) MaterialTheme.colorScheme.onBackground else ScentDivider,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { isUploaded = !isUploaded },
@@ -100,14 +106,16 @@ fun UploadPaymentProofScreen(
                     Icon(
                         imageVector = Icons.Default.CloudUpload,
                         contentDescription = "Upload",
-                        tint = if (isUploaded) ScentWhite else ScentTextMuted,
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        tint = if (isUploaded) MaterialTheme.colorScheme.onBackground else ScentTextMuted,
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = if (isUploaded) "Bukti berhasil dipilih (Ketuk untuk ganti)" else "Ketuk untuk upload gambar",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (isUploaded) ScentWhite else ScentTextMuted
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = if (isUploaded) MaterialTheme.colorScheme.onBackground else ScentTextMuted
                     )
                 }
             }
@@ -117,7 +125,8 @@ fun UploadPaymentProofScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .background(ScentBlack)
+                // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 20.dp, vertical = 16.dp)
                 .navigationBarsPadding()
         ) {
@@ -125,7 +134,11 @@ fun UploadPaymentProofScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(if (isUploaded) ScentWhite else Color(0xFF333333))
+                    .background(
+                        // ✅ FIX: Ganti ScentWhite/Color(0xFF333333) → MaterialTheme.colorScheme
+                        if (isUploaded) MaterialTheme.colorScheme.onBackground
+                        else MaterialTheme.colorScheme.surfaceVariant
+                    )
                     .clickable(enabled = isUploaded, onClick = onSubmit)
                     .padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
@@ -136,7 +149,9 @@ fun UploadPaymentProofScreen(
                         fontSize = 12.sp,
                         letterSpacing = 2.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isUploaded) ScentBlack else ScentTextMuted
+                        // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+                        color = if (isUploaded) MaterialTheme.colorScheme.background
+                        else ScentTextMuted
                     )
                 )
             }

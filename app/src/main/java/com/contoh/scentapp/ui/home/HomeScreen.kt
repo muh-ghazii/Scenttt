@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,14 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.contoh.scentapp.data.model.HeroBanner
 import com.contoh.scentapp.data.model.HomeUiState
 import com.contoh.scentapp.data.model.Product
-import com.contoh.scentapp.ui.theme.ScentBlack
-import com.contoh.scentapp.ui.theme.ScentDivider
-import com.contoh.scentapp.ui.theme.ScentGold
-import com.contoh.scentapp.ui.theme.ScentSearchBg
-import com.contoh.scentapp.ui.theme.ScentTextLabel
-import com.contoh.scentapp.ui.theme.ScentTextMuted
-import com.contoh.scentapp.ui.theme.ScentTextPrimary
-import com.contoh.scentapp.ui.theme.ScentWhite
+import com.contoh.scentapp.ui.theme.*
 
 @Composable
 fun HomeScreen(
@@ -54,7 +46,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (uiState.isLoading) {
             CircularProgressIndicator(
@@ -86,9 +78,7 @@ private fun HomeContent(
         modifier       = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
-        item(key = "topbar") {
-            ScentTopBar()
-        }
+        item(key = "topbar") { ScentTopBar() }
         item(key = "search") {
             ScentSearchBarButton(
                 onClick  = onSearchClick,
@@ -106,20 +96,13 @@ private fun HomeContent(
         item(key = "section_header") {
             CollectionHeader(
                 modifier = Modifier.padding(
-                    start  = 20.dp,
-                    end    = 20.dp,
-                    top    = 28.dp,
-                    bottom = 16.dp
+                    start  = 20.dp, end = 20.dp, top = 28.dp, bottom = 16.dp
                 )
             )
         }
         val products = uiState.filteredProducts
         val rows     = products.chunked(2)
-
-        items(
-            count = rows.size,
-            key   = { "row_$it" }
-        ) { rowIndex ->
+        items(count = rows.size, key = { "row_$it" }) { rowIndex ->
             ProductRow(
                 products         = rows[rowIndex],
                 onProductClick   = onProductClick,
@@ -143,7 +126,7 @@ private fun ScentTopBar() {
         Icon(
             imageVector        = Icons.Default.Menu,
             contentDescription = "Menu",
-            tint               = ScentWhite,
+            tint               = MaterialTheme.colorScheme.onBackground,
             modifier           = Modifier.size(24.dp)
         )
         Text(
@@ -153,22 +136,19 @@ private fun ScentTopBar() {
                 letterSpacing = 6.sp,
                 fontSize      = 18.sp
             ),
-            color = ScentWhite
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.size(24.dp))
     }
 }
 
 @Composable
-private fun ScentSearchBarButton(
-    onClick  : () -> Unit,
-    modifier : Modifier = Modifier
-) {
+private fun ScentSearchBarButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(ScentSearchBg)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
@@ -189,10 +169,7 @@ private fun ScentSearchBarButton(
 }
 
 @Composable
-private fun HeroBannerCard(
-    banner   : HeroBanner,
-    modifier : Modifier = Modifier
-) {
+private fun HeroBannerCard(banner: HeroBanner, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -200,21 +177,14 @@ private fun HeroBannerCard(
             .clip(RoundedCornerShape(16.dp))
             .background(
                 Brush.linearGradient(
-                    colors = listOf(
-                        Color(banner.gradientStart),
-                        Color(banner.gradientEnd)
-                    )
+                    colors = listOf(Color(banner.gradientStart), Color(banner.gradientEnd))
                 )
             )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color(0x00000000), Color(0xCC000000))
-                    )
-                )
+                .background(Brush.verticalGradient(listOf(Color(0x00000000), Color(0xCC000000))))
         )
         Box(
             modifier = Modifier
@@ -226,21 +196,15 @@ private fun HeroBannerCard(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .width(70.dp)
-                    .height(130.dp)
+                    .width(70.dp).height(130.dp)
                     .clip(RoundedCornerShape(6.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color(0xFF4A4A4A), Color(0xFF1A1A1A))
-                        )
-                    )
+                    .background(Brush.verticalGradient(listOf(Color(0xFF4A4A4A), Color(0xFF1A1A1A))))
                     .border(0.5.dp, Color(0xFF666666), RoundedCornerShape(6.dp))
             )
             Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .width(30.dp)
-                    .height(28.dp)
+                    .width(30.dp).height(28.dp)
                     .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
                     .background(Color(0xFF222222))
             )
@@ -248,34 +212,26 @@ private fun HeroBannerCard(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .padding(top = 22.dp)
-                    .width(14.dp)
-                    .height(18.dp)
+                    .width(14.dp).height(18.dp)
                     .background(Color(0xFF333333))
             )
         }
         Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(20.dp)
+            modifier = Modifier.align(Alignment.BottomStart).padding(20.dp)
         ) {
             Text(
                 text  = banner.tag,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    letterSpacing = 2.sp,
-                    color         = ScentGold
+                    letterSpacing = 2.sp, color = ScentGold
                 )
             )
             Spacer(Modifier.height(8.dp))
-            Text(
-                text  = banner.title,
-                style = MaterialTheme.typography.displayMedium
-            )
+            Text(text = banner.title, style = MaterialTheme.typography.displayMedium)
             Spacer(Modifier.height(10.dp))
             Text(
                 text     = banner.description,
                 style    = MaterialTheme.typography.bodySmall.copy(
-                    color      = ScentTextPrimary,
-                    lineHeight = 18.sp
+                    color = ScentTextPrimary, lineHeight = 18.sp
                 ),
                 maxLines = 4,
                 overflow = TextOverflow.Ellipsis
@@ -290,14 +246,15 @@ private fun CollectionHeader(modifier: Modifier = Modifier) {
         Text(
             text  = "KURASI",
             style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 2.sp,
-                color         = ScentTextLabel
+                letterSpacing = 2.sp, color = ScentTextLabel
             )
         )
         Spacer(Modifier.height(4.dp))
         Text(
             text  = "Koleksi Kami",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
         )
     }
 }
@@ -309,10 +266,7 @@ private fun ProductRow(
     onFavoriteToggle : (Int) -> Unit,
     modifier         : Modifier = Modifier
 ) {
-    Row(
-        modifier              = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         products.forEach { product ->
             ProductCard(
                 product          = product,
@@ -321,9 +275,7 @@ private fun ProductRow(
                 modifier         = Modifier.weight(1f)
             )
         }
-        if (products.size == 1) {
-            Spacer(modifier = Modifier.weight(1f))
-        }
+        if (products.size == 1) Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -335,8 +287,7 @@ private fun ProductCard(
     modifier         : Modifier = Modifier
 ) {
     val heartTint by animateColorAsState(
-        targetValue   = if (product.isFavorite) ScentGold
-        else ScentWhite.copy(alpha = 0.7f),
+        targetValue   = if (product.isFavorite) ScentGold else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
         animationSpec = tween(300),
         label         = "heartColor_${product.id}"
     )
@@ -344,8 +295,7 @@ private fun ProductCard(
     Column(modifier = modifier.clickable(onClick = onClick)) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(170.dp)
+                .fillMaxWidth().height(170.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(
                     Brush.linearGradient(
@@ -356,17 +306,11 @@ private fun ProductCard(
                     )
                 )
         ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .width(44.dp)
-                    .height(80.dp)
-            ) {
+            Box(modifier = Modifier.align(Alignment.Center).width(44.dp).height(80.dp)) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .width(40.dp)
-                        .height(66.dp)
+                        .width(40.dp).height(66.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(
                             Brush.verticalGradient(
@@ -376,53 +320,41 @@ private fun ProductCard(
                                 )
                             )
                         )
-                        .border(
-                            0.5.dp,
-                            Color(product.accentColor).copy(alpha = 0.4f),
-                            RoundedCornerShape(4.dp)
-                        )
+                        .border(0.5.dp, Color(product.accentColor).copy(alpha = 0.4f), RoundedCornerShape(4.dp))
                 )
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .width(16.dp)
-                        .height(12.dp)
+                        .width(16.dp).height(12.dp)
                         .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
                         .background(Color(product.accentColor).copy(alpha = 0.4f))
                 )
             }
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(10.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(ScentBlack.copy(alpha = 0.5f))
+                    .align(Alignment.TopEnd).padding(10.dp)
+                    .size(32.dp).clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.5f))
                     .clickable(onClick = onFavoriteToggle),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector        = if (product.isFavorite) Icons.Filled.Favorite
-                    else Icons.Outlined.FavoriteBorder,
+                    imageVector        = if (product.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favorit",
                     tint               = heartTint,
                     modifier           = Modifier.size(16.dp)
                 )
             }
         }
-
         Spacer(Modifier.height(10.dp))
         Text(
             text  = product.brand,
-            style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 1.5.sp,
-                color         = ScentTextLabel
-            )
+            style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.5.sp, color = ScentTextLabel)
         )
         Spacer(Modifier.height(2.dp))
         Text(
             text     = product.name,
-            style    = MaterialTheme.typography.titleMedium,
+            style    = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onBackground),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -436,7 +368,7 @@ private fun ProductCard(
                 text  = product.price,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
-                    color      = ScentWhite
+                    color      = MaterialTheme.colorScheme.onBackground
                 )
             )
             Text(

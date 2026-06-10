@@ -7,35 +7,59 @@ import com.contoh.scentapp.data.model.ActiveOrder
 import com.contoh.scentapp.data.model.OrderStatus
 import com.contoh.scentapp.data.model.SalesProduct
 import com.contoh.scentapp.data.model.SalesUiState
+import com.contoh.scentapp.data.repository.ProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SalesViewModel : ViewModel() {
+class SalesViewModel(
+    // ✅ Pakai getInstance() agar instance-nya sama dengan HomeViewModel
+    private val repository: ProductRepository = ProductRepository.getInstance()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SalesUiState())
     val uiState: StateFlow<SalesUiState> = _uiState.asStateFlow()
 
-    init { loadData() }
+    init {
+        loadData()
+        observeSalesProducts()
+    }
 
+    // ── Load orders (static) ─────────────────────────────────────────────────
     private fun loadData() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isLoading  = false,
-                    products   = demoProducts(),
+                    isLoading    = false,
                     activeOrders = demoOrders()
                 )
             }
         }
     }
 
-    fun deleteProduct(productId: Int) {
-        _uiState.update { state ->
-            state.copy(products = state.products.filter { it.id != productId })
+    // ── ✅ Observe salesProducts dari Repository secara real-time ─────────────
+    // Setiap kali addProduct() dipanggil, list ini otomatis ter-update
+    private fun observeSalesProducts() {
+        viewModelScope.launch {
+            repository.salesProducts.collect { products ->
+                _uiState.update { it.copy(products = products) }
+            }
         }
+    }
+
+    // ── Actions ───────────────────────────────────────────────────────────────
+
+    // ✅ FIX: addProduct sekarang ke Repository, bukan hanya ke _uiState lokal.
+    // Repository akan notify HomeViewModel secara otomatis via products Flow.
+    fun addProduct(product: SalesProduct) {
+        repository.addProduct(product)
+    }
+
+    // ✅ FIX: deleteProduct juga ke Repository agar sinkron dengan HomeScreen
+    fun deleteProduct(productId: Int) {
+        repository.deleteProduct(productId)
     }
 
     fun markAsPacked(orderId: String) {
@@ -57,37 +81,6 @@ class SalesViewModel : ViewModel() {
             )
         }
     }
-
-    fun addProduct(product: SalesProduct) {
-        _uiState.update { state ->
-            state.copy(products = state.products + product)
-        }
-    }
-
-    private fun demoProducts() = listOf(
-        SalesProduct(
-            id          = 201,
-            name        = "NOCTURNAL OUD",
-            aromaFamily = "WOODY",
-            volume      = "100ML",
-            stockStatus = "TERSEDIA",
-            price       = 285_000,
-            stock       = 24,
-            cardColor   = 0xFF1A1A1A,
-            accentColor = 0xFFD4A853
-        ),
-        SalesProduct(
-            id          = 202,
-            name        = "ETHEREAL MIST",
-            aromaFamily = "FLORAL",
-            volume      = "50ML",
-            stockStatus = "STOK MENIPIS",
-            price       = 195_000,
-            stock       = 3,
-            cardColor   = 0xFF1A2020,
-            accentColor = 0xFF8BA0B0
-        )
-    )
 
     private fun demoOrders() = listOf(
         ActiveOrder(

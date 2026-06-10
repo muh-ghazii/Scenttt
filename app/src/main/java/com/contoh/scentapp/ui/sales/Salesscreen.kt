@@ -35,20 +35,20 @@ import com.contoh.scentapp.data.model.OrderStatus
 import com.contoh.scentapp.data.model.SalesProduct
 import com.contoh.scentapp.ui.theme.*
 
-
 @Composable
 fun SalesScreen(
-    onBack         : () -> Unit = {},
-    onAddProduct   : () -> Unit = {},
-    viewModel      : SalesViewModel = viewModel(factory = SalesViewModelFactory())
+    onBack       : () -> Unit = {},
+    onAddProduct : () -> Unit = {},
+    viewModel    : SalesViewModel = viewModel(factory = SalesViewModelFactory())
 ) {
-    val uiState   by viewModel.uiState.collectAsStateWithLifecycle()
-    val listState  = rememberLazyListState()
+    val uiState  by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ScentBlack)
+            // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.background
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             state          = listState,
@@ -67,56 +67,47 @@ fun SalesScreen(
                     Icon(
                         imageVector        = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Kembali",
-                        tint               = ScentWhite,
-                        modifier           = Modifier
-                            .size(24.dp)
-                            .clickable(onClick = onBack)
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        tint               = MaterialTheme.colorScheme.onBackground,
+                        modifier           = Modifier.size(24.dp).clickable(onClick = onBack)
                     )
                     Text(
                         text  = "SCENT",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            letterSpacing = 6.sp,
-                            fontSize      = 18.sp,
-                            fontWeight    = FontWeight.Bold
+                            letterSpacing = 6.sp, fontSize = 18.sp, fontWeight = FontWeight.Bold
                         ),
-                        color = ScentWhite
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Icon(
                         imageVector        = Icons.Default.ShoppingBag,
                         contentDescription = null,
-                        tint               = ScentWhite,
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        tint               = MaterialTheme.colorScheme.onBackground,
                         modifier           = Modifier.size(24.dp)
                     )
                 }
             }
             item(key = "header") {
                 Column(
-                    modifier = Modifier.padding(
-                        start  = 20.dp,
-                        end    = 20.dp,
-                        top    = 4.dp,
-                        bottom = 20.dp
-                    )
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 20.dp)
                 ) {
                     Text(
                         text  = "PERFORMA ATELIER",
                         style = MaterialTheme.typography.displayMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 28.sp,
-                            lineHeight = 34.sp
+                            fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 34.sp
                         ),
-                        color = ScentWhite
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
                         text  = "Tinjauan komprehensif tentang kreasi olfaktori dan logistik musiman Anda.",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color      = ScentTextMuted,
-                            lineHeight = 18.sp
+                            color = ScentTextMuted, lineHeight = 18.sp
                         )
                     )
                     Spacer(Modifier.height(20.dp))
-
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -130,7 +121,8 @@ fun SalesScreen(
                             Icon(
                                 imageVector        = Icons.Default.Add,
                                 contentDescription = null,
-                                tint               = ScentWhite,
+                                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                tint               = MaterialTheme.colorScheme.onBackground,
                                 modifier           = Modifier.size(18.dp)
                             )
                             Spacer(Modifier.width(8.dp))
@@ -140,14 +132,14 @@ fun SalesScreen(
                                     fontSize      = 12.sp,
                                     letterSpacing = 2.sp,
                                     fontWeight    = FontWeight.Bold,
-                                    color         = ScentWhite
+                                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                                    color         = MaterialTheme.colorScheme.onBackground
                                 )
                             )
                         }
                     }
                 }
             }
-
             item(key = "stats") {
                 Column(
                     modifier            = Modifier.padding(horizontal = 20.dp),
@@ -169,32 +161,25 @@ fun SalesScreen(
             }
             item(key = "koleksi_header") {
                 Row(
-                    modifier              = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    modifier              = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment     = Alignment.CenterVertically
                 ) {
                     Text(
                         text  = "KOLEKSI",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 20.sp
+                            fontWeight = FontWeight.Bold, fontSize = 20.sp
                         ),
-                        color = ScentWhite
+                        // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Icon(Icons.Default.FilterList, null,
-                            tint = ScentTextMuted, modifier = Modifier.size(22.dp))
-                        Icon(Icons.Default.Search, null,
-                            tint = ScentTextMuted, modifier = Modifier.size(22.dp))
+                        Icon(Icons.Default.FilterList, null, tint = ScentTextMuted, modifier = Modifier.size(22.dp))
+                        Icon(Icons.Default.Search, null, tint = ScentTextMuted, modifier = Modifier.size(22.dp))
                     }
                 }
             }
-            items(
-                items = uiState.products,
-                key   = { "sales_product_${it.id}" }
-            ) { product ->
+            items(items = uiState.products, key = { "sales_product_${it.id}" }) { product ->
                 SalesProductItem(
                     product  = product,
                     onEdit   = { },
@@ -213,25 +198,18 @@ fun SalesScreen(
                     text     = "PENGIRIMAN AKTIF",
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                     style    = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize   = 20.sp
+                        fontWeight = FontWeight.Bold, fontSize = 20.sp
                     ),
-                    color    = ScentWhite
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    color    = MaterialTheme.colorScheme.onBackground
                 )
             }
-
-            items(
-                items = uiState.activeOrders,
-                key   = { "order_${it.orderId}" }
-            ) { order ->
+            items(items = uiState.activeOrders, key = { "order_${it.orderId}" }) { order ->
                 ActiveOrderCard(
-                    order        = order,
-                    onMarkPacked = { viewModel.markAsPacked(order.orderId) },
+                    order         = order,
+                    onMarkPacked  = { viewModel.markAsPacked(order.orderId) },
                     onMarkShipped = { viewModel.markAsShipped(order.orderId) },
-                    modifier     = Modifier.padding(
-                        horizontal = 20.dp,
-                        vertical   = 6.dp
-                    )
+                    modifier      = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                 )
             }
         }
@@ -242,22 +220,21 @@ fun SalesScreen(
 private fun StatCard(
     label    : String,
     value    : String,
-    subLabel : String?  = null,
-    isLarge  : Boolean  = false
+    subLabel : String? = null,
+    isLarge  : Boolean = false
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(ScentBlack)
+            // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.surfaceVariant
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(20.dp)
     ) {
         Text(
             text  = label,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontSize      = 10.sp,
-                letterSpacing = 2.sp,
-                color         = ScentTextLabel
+                fontSize = 10.sp, letterSpacing = 2.sp, color = ScentTextLabel
             )
         )
         Spacer(Modifier.height(8.dp))
@@ -267,7 +244,8 @@ private fun StatCard(
                 fontWeight = FontWeight.Bold,
                 fontSize   = if (isLarge) 32.sp else 28.sp
             ),
-            color = ScentWhite
+            // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (subLabel != null) {
             Spacer(Modifier.height(6.dp))
@@ -281,9 +259,7 @@ private fun StatCard(
                 Spacer(Modifier.width(4.dp))
                 Text(
                     text  = subLabel,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = ScentTextMuted
-                    )
+                    style = MaterialTheme.typography.bodySmall.copy(color = ScentTextMuted)
                 )
             }
         }
@@ -298,9 +274,7 @@ private fun SalesProductItem(
     modifier : Modifier = Modifier
 ) {
     Row(
-        modifier          = modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
+        modifier          = modifier.fillMaxWidth().padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -318,59 +292,34 @@ private fun SalesProductItem(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(modifier = Modifier.width(8.dp).height(6.dp).background(Color(product.accentColor).copy(alpha = 0.5f)))
                 Box(
-                    modifier = Modifier
-                        .width(8.dp).height(6.dp)
-                        .background(Color(product.accentColor).copy(alpha = 0.5f))
-                )
-                Box(
-                    modifier = Modifier
-                        .width(28.dp).height(45.dp)
+                    modifier = Modifier.width(28.dp).height(45.dp)
                         .clip(RoundedCornerShape(3.dp))
                         .background(Color(product.accentColor).copy(alpha = 0.2f))
-                        .border(0.5.dp, Color(product.accentColor).copy(alpha = 0.4f),
-                            RoundedCornerShape(3.dp))
+                        .border(0.5.dp, Color(product.accentColor).copy(alpha = 0.4f), RoundedCornerShape(3.dp))
                 )
             }
         }
-
         Spacer(Modifier.width(16.dp))
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text  = product.name,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = 15.sp
-                ),
-                color = ScentWhite
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 15.sp),
+                // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text  = "${product.aromaFamily} • ${product.volume} • ${product.stockStatus}",
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = if (product.stockStatus == "STOK MENIPIS")
-                        Color(0xFFD4A853) else ScentTextMuted
+                    color = if (product.stockStatus == "STOK MENIPIS") Color(0xFFD4A853) else ScentTextMuted
                 )
             )
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Icon(
-                    imageVector        = Icons.Default.Edit,
-                    contentDescription = "Edit",
-                    tint               = ScentTextMuted,
-                    modifier           = Modifier
-                        .size(20.dp)
-                        .clickable(onClick = onEdit)
-                )
-                Icon(
-                    imageVector        = Icons.Default.Delete,
-                    contentDescription = "Hapus",
-                    tint               = ScentTextMuted,
-                    modifier           = Modifier
-                        .size(20.dp)
-                        .clickable(onClick = onDelete)
-                )
+                Icon(Icons.Default.Edit, "Edit", tint = ScentTextMuted, modifier = Modifier.size(20.dp).clickable(onClick = onEdit))
+                Icon(Icons.Default.Delete, "Hapus", tint = ScentTextMuted, modifier = Modifier.size(20.dp).clickable(onClick = onDelete))
             }
         }
     }
@@ -387,10 +336,10 @@ private fun ActiveOrderCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(ScentBlack)
+            // ✅ FIX: Ganti ScentBlack → MaterialTheme.colorScheme.surfaceVariant
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        // Header
         Row(
             modifier              = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -400,97 +349,62 @@ private fun ActiveOrderCard(
                 Text(
                     text  = "ORDER #${order.orderId}",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize      = 10.sp,
-                        letterSpacing = 1.5.sp,
-                        color         = ScentTextLabel
+                        fontSize = 10.sp, letterSpacing = 1.5.sp, color = ScentTextLabel
                     )
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text  = "${order.buyerName} • ${order.itemCount} Item",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize   = 16.sp
-                    ),
-                    color = ScentWhite
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp),
+                    // ✅ FIX: Ganti ScentWhite → MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
-            // Status badge
-            if (order.status != OrderStatus.DALAM_PROSES) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(ScentSearchBg)
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text  = "✓ ${order.status.label}",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.sp,
-                            color         = ScentGold
-                        )
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text  = if (order.status != OrderStatus.DALAM_PROSES) "✓ ${order.status.label}" else order.status.label,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = 10.sp, letterSpacing = 1.sp,
+                        color = if (order.status != OrderStatus.DALAM_PROSES) ScentGold
+                        else MaterialTheme.colorScheme.onBackground
                     )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(ScentSearchBg)
-                        .padding(horizontal = 10.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text  = order.status.label,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.sp,
-                            color         = ScentWhite
-                        )
-                    )
-                }
+                )
             }
         }
-
         Spacer(Modifier.height(16.dp))
-
         when (order.status) {
             OrderStatus.DALAM_PROSES -> {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp))
                             .border(1.dp, ScentDivider, RoundedCornerShape(8.dp))
-                            .clickable(onClick = onMarkPacked)
-                            .padding(vertical = 12.dp),
+                            .clickable(onClick = onMarkPacked).padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text  = "TANDAI DIKEMAS",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize      = 9.sp,
-                                letterSpacing = 1.5.sp,
-                                fontWeight    = FontWeight.Bold,
-                                color         = ScentWhite
+                                fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         )
                     }
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp))
                             .border(1.dp, ScentDivider, RoundedCornerShape(8.dp))
-                            .clickable(onClick = onMarkShipped)
-                            .padding(vertical = 12.dp),
+                            .clickable(onClick = onMarkShipped).padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text  = "TANDAI DIKIRIM",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize      = 9.sp,
-                                letterSpacing = 1.5.sp,
-                                fontWeight    = FontWeight.Bold,
-                                color         = ScentWhite
+                                fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         )
                     }
@@ -499,78 +413,54 @@ private fun ActiveOrderCard(
             OrderStatus.DIKEMAS -> {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(ScentWhite)
-                            .clickable(onClick = onMarkShipped)
-                            .padding(vertical = 12.dp),
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.onBackground)
+                            .clickable(onClick = onMarkShipped).padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text  = "KIRIM SEKARANG",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize      = 10.sp,
-                                letterSpacing = 1.5.sp,
-                                fontWeight    = FontWeight.Bold,
-                                color         = ScentBlack
+                                fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                     }
                     Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(1.dp, ScentDivider, RoundedCornerShape(8.dp))
-                            .clickable { },
+                        modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, ScentDivider, RoundedCornerShape(8.dp)).clickable { },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector        = Icons.Default.MoreHoriz,
-                            contentDescription = "Lainnya",
-                            tint               = ScentWhite,
-                            modifier           = Modifier.size(20.dp)
-                        )
+                        Icon(Icons.Default.MoreHoriz, "Lainnya", tint = MaterialTheme.colorScheme.onBackground, modifier = Modifier.size(20.dp))
                     }
                 }
             }
             OrderStatus.DIKIRIM -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(ScentSearchBg)
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.background).padding(vertical = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text  = "DALAM PENGIRIMAN",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.5.sp,
-                            fontWeight    = FontWeight.Bold,
-                            color         = ScentTextMuted
+                            fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                            color = ScentTextMuted
                         )
                     )
                 }
             }
-
             else -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(ScentSearchBg)
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.background).padding(vertical = 12.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text  = order.status.label,
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize      = 10.sp,
-                            letterSpacing = 1.5.sp,
-                            fontWeight    = FontWeight.Bold,
-                            color         = ScentTextMuted
+                            fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                            color = ScentTextMuted
                         )
                     )
                 }
